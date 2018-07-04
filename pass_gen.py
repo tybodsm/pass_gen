@@ -8,12 +8,14 @@ from random import SystemRandom
 import pandas as pd
 import requests
 
+# Settings:
+wordlist_url = 'https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt'
+rolls = 5
+
+#Cryptographically secure 👍👍
 crypt_gen = SystemRandom()
 
 def main(words):    
-    #Cryptographically secure 👍👍
-    wordlist_url = 'https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt'
-
     #draw in the wordlist
     r = requests.get(wordlist_url)
     lst = r.text.replace('\t', ',')
@@ -33,7 +35,7 @@ def roll(n):
     return out
 
 def word(wordlist):
-    return wordlist.loc[roll(5)].word
+    return wordlist.loc[roll(rolls)].word
 
 def pass_gen(w, wordlist):
     words = [word(wordlist) for i in range(w)]
@@ -47,8 +49,16 @@ if __name__ == '__main__':
         '-w', '--words',
         default=5,
         type=int,
-        help='Sets the number of words in the generated password',
+        help='Set the number of words in the generated password(s).',
     )
 
-    print(main(cli_args.parse_args().words))
+    cli_args.add_argument(
+        '-n', '--number',
+        default=1,
+        type=int,
+        help='Set the number of passwords to generate. Useful when finding one you can more easily memorize.',
+    )
+
+    for i in range(cli_args.parse_args().number):
+        print(main(cli_args.parse_args().words))
 
